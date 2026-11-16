@@ -128,7 +128,31 @@ function copyPreviousWeek(){const start=monday(anchor),source=plusDays(start,-7)
 function editMeal(date,meal){
   const names=[...entry(date,meal)];
   showModal(`${date}　${meal}`,root=>{
-    root.append(el('p','hint','料理を1品ずつ追加できます。保存すると献立表に反映されます。'));const copyActions=el('div','actions');copyActions.append(btn('献立をコピー',()=>{if(!names.length)return alert('コピーする料理がありません。');copiedMeal={date,meal,names:[...names]};alert('献立をコピーしました。貼り付け先の食事を開いてください。')},'action secondary'));const pasteButton=btn('貼り付け',()=>pasteMealInto(date,meal),'action secondary');if(!copiedMeal?.names?.length)pasteButton.disabled=true;copyActions.append(pasteButton);root.append(copyActions);
+     const repeatDay=new Date(date+'T12:00:00').getDay();
+     const repeatNames=state.recurring?.[repeatDay]?.[meal]||[];
+     const repeatBox=el('div','repeat-controls');
+     const repeatInfo=el('p','hint',repeatNames.length?`毎週${days[repeatDay]}曜日の${meal}に設定中：${repeatNames.join('・')}`:`毎週${days[repeatDay]}曜日の${meal}に同じ献立を表示できます（個別に保存した日を除く）。`);
+     repeatBox.append(repeatInfo);
+     const repeatActions=el('div','actions');
+     const repeatSave=btn('毎週繰り返す',async()=>{
+       if(!names.length)return alert('先に繰り返す料理を登録してください。');
+       if(!confirm(`「${names.join('・')}」を毎週${days[repeatDay]}曜日の${meal}に設定しますか？\nすでに個別に保存した日の献立は変更されません。`))return;
+       const before=structuredClone(state.recurring||{});
+       state.recurring??={};state.recurring[repeatDay]??={};state.recurring[repeatDay][meal]=[...names];
+       repeatSave.disabled=true;
+       try{await persist();hideModal();renderCalendar();alert('毎週の繰り返し献立を設定しました。')}catch(e){state.recurring=before;repeatSave.disabled=false;console.error(e)}
+     },'action secondary');
+     repeatActions.append(repeatSave);
+     if(repeatNames.length){
+       const stop=btn('繰り返しを解除',async()=>{
+         if(!confirm(`毎週${days[repeatDay]}曜日の${meal}の繰り返しを解除しますか？\n個別に保存した献立は残ります。`))return;
+         const before=structuredClone(state.recurring||{});
+         delete state.recurring[repeatDay][meal];
+         try{await persist();hideModal();renderCalendar();alert('繰り返しを解除しました。')}catch(e){state.recurring=before;console.error(e)}
+       },'mini');repeatActions.append(stop);
+     }
+     repeatBox.append(repeatActions);
+     root.append(el('p','hint','料理を1品ずつ追加できます。保存すると献立表に反映されます。'));const copyActions=el('div','actions');copyActions.append(btn('献立をコピー',()=>{if(!names.length)return alert('コピーする料理がありません。');copiedMeal={date,meal,names:[...names]};alert('献立をコピーしました。貼り付け先の食事を開いてください。')},'action secondary'));const pasteButton=btn('貼り付け',()=>pasteMealInto(date,meal),'action secondary');if(!copiedMeal?.names?.length)pasteButton.disabled=true;copyActions.append(pasteButton);root.append(copyActions);
     const list=el('div');root.append(list);
     function draw(){
       list.replaceChildren();
@@ -147,10 +171,10 @@ function editMeal(date,meal){
     const [wrap,input]=field('料理名を入力');input.placeholder='例：肉じゃが';root.append(wrap);
     const actions=el('div','actions');actions.append(btn('料理を追加',()=>{const v=input.value.trim();if(!v)return alert('料理名を入力してください');names.push(v);input.value='';draw()},'action secondary'));root.append(actions);
     if(state.dishes.length){root.append(el('h3','section-title','登録済み料理から追加'));const search=el('input','search');search.placeholder='料理名で検索';root.append(search);const chips=el('div');root.append(chips);function updateChips(){chips.replaceChildren();state.dishes.filter(d=>d.name.toLowerCase().includes(search.value.toLowerCase())).sort((a,b)=>Number(!!b.favorite)-Number(!!a.favorite)).forEach(d=>chips.append(btn((d.favorite?'★ ':'＋ ')+d.name,()=>{names.push(d.name);draw()},'dish-chip')))}search.addEventListener('input',updateChips);updateChips()}
-    const foot=el('div','actions');foot.append(btn('保存する',async()=>{state.menus[date]??={};state.menus[date][meal]=names;try{await persist();hideModal();renderCalendar()}catch(e){console.error(e)}},'action'));foot.append(btn('この食事を空にする',()=>{if(confirm('この食事の献立を削除しますか？')){names.length=0;draw()}},'action secondary'));root.append(foot);
+    const foot=el('div','actions');foot.append(btn('保存する',async()=>{state.menus[date]??={};state.menus[date][meal]=names;try{await persist();hideModal();renderCalendar()}catch(e){console.error(e)}},'action'));foot.append(btn('この食事を空にする',()=>{if(confirm('この食事の献立を削除しますか？')){names.length=0;draw()}},'action secondary'));root.append(foot);root.append(el('h3','section-title','毎週の繰り返し'));root.append(repeatBox);
   });
 }
-function changeTab(next){tab=next;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('calendarScreen').classList.toggle('hidden',tab!=='calendar');$('otherScreen').classList.toggle('hidden',tab==='calendar');if(tab==='calendar')renderCalendar();else renderPanel()}
+ function changeTab(next){tab=next;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('calendarScreen').classList.toggle('hidden',tab!=='calendar');$('otherScreen').classList.toggle('hidden',tab==='calendar');if(tab==='calendar')renderCalendar();else renderPanel()}
 function renderPanel(){const titles={dishes:'料理一覧',shopping:'買い物リスト',settings:'設定'};$('panelTitle').textContent=titles[tab];const root=$('panelContent');root.replaceChildren();if(tab==='dishes')renderDishes(root);if(tab==='shopping')renderShopping(root);if(tab==='settings')renderSettings(root)}
 const categories=['主食','主菜','副菜','汁物','麺類','その他'];
 function editDish(dish=null){showModal(dish?'料理を編集':'料理を登録',root=>{const [w1,name]=field('料理名（必須）',dish?.name||'');root.append(w1);const label=el('label','field','カテゴリ');const select=el('select');categories.forEach(c=>{const opt=el('option','',c);opt.value=c;select.append(opt)});select.value=dish?.category||'その他';label.append(select);root.append(label);const [w2,ingredients]=field('食材（任意・カンマ区切り）',(dish?.ingredients||[]).join('、'));ingredients.placeholder='例：じゃがいも 3個、豚肉 200g';root.append(el('p','hint','数量を登録する場合は「玉ねぎ 2個」のように食材名と数量を空白で区切ってください。')); root.append(w2);const [w3,memo]=field('メモ（任意）',dish?.memo||'');root.append(w3);root.append(btn('保存する',async()=>{const v=name.value.trim();if(!v)return alert('料理名を入力してください');const data={id:dish?.id||uid(),name:v,category:select.value,ingredients:ingredients.value.split(/[、,，\n]/).map(x=>x.trim()).filter(Boolean),memo:memo.value.trim(),favorite:!!dish?.favorite,createdAt:dish?.createdAt||Date.now()};if(dish){const i=state.dishes.findIndex(x=>x.id===dish.id);if(i<0)return alert('料理が見つかりません');state.dishes[i]=data}else state.dishes.unshift(data);try{await persist();hideModal();renderPanel()}catch(e){console.error(e)}},'action'))})}
@@ -192,3 +216,4 @@ $('prev').addEventListener('click',()=>{anchor=mode==='week'?plusDays(anchor,-7)
 initDB().then(()=>{applyTheme();renderCalendar()}).catch(e=>{console.error(e);alert('データ保存の初期化に失敗しました。Safariのプライベートブラウズ設定などを確認してください。');applyTheme();renderCalendar()});
 })();
 </script></body></html>
+`
