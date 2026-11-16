@@ -26,7 +26,7 @@ input[type="text"],input[type="search"],textarea,select,.search,.field input,.fi
 (()=>{'use strict';
 const $=id=>document.getElementById(id),days=['日','月','火','水','木','金','土'],meals=['朝食','昼食','夕食'],today=new Date();today.setHours(12,0,0,0);
 let anchor=new Date(today),mode='week',tab='calendar',db=null,saveQueue=Promise.resolve();
-const defaults=()=>({menus:{},dishes:[],shopping:[],recurring:{},settings:{visible:[true,true,true],theme:'auto',color:'green'}});
+const defaults=()=>({menus:{},dishes:[],shopping:[],recipes:{},recurring:{},settings:{visible:[true,true,true],theme:'auto',color:'green'}});
 let state=defaults();
 const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const fmt=d=>`${d.getMonth()+1}月${d.getDate()}日`,same=(a,b)=>key(a)===key(b);
@@ -100,7 +100,7 @@ function addWeekIngredients(){
 }
 function writeSnapshot(snapshot){if(!db)return Promise.reject(new Error('データベースを開けません'));return new Promise((resolve,reject)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').put(snapshot,'app');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('保存が中断されました'))})}
 function persist(){const snapshot=structuredClone(state);const operation=saveQueue.catch(()=>{}).then(()=>writeSnapshot(snapshot));saveQueue=operation;operation.catch(e=>{console.error(e);alert('保存できませんでした。ブラウザの保存容量や設定を確認してください。')});return operation}
-function initDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open('kondate-biyori-v02',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('data'))r.result.createObjectStore('data')};r.onsuccess=()=>{db=r.result;const tx=db.transaction('data','readonly');const q=tx.objectStore('data').get('app');q.onsuccess=()=>{if(q.result){const d=q.result;state={...defaults(),...d,recurring:d.recurring||{},settings:{...defaults().settings,...d.settings}}}resolve()};q.onerror=()=>reject(q.error)};r.onerror=()=>reject(r.error)})}
+function initDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open('kondate-biyori-v02',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('data'))r.result.createObjectStore('data')};r.onsuccess=()=>{db=r.result;const tx=db.transaction('data','readonly');const q=tx.objectStore('data').get('app');q.onsuccess=()=>{if(q.result){const d=q.result;state={...defaults(),...d,recurring:d.recurring||{},recipes:d.recipes||{},settings:{...defaults().settings,...d.settings}}}resolve()};q.onerror=()=>reject(q.error)};r.onerror=()=>reject(r.error)})}
 function applyTheme(){const colors={green:'#437d59',orange:'#c57841',pink:'#b76a88',blue:'#4b80aa',purple:'#8067a5',brown:'#927052'};document.documentElement.style.setProperty('--accent',colors[state.settings.color]||colors.green);document.body.classList.toggle('dark',state.settings.theme==='dark'||(state.settings.theme==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))}
 function showModal(title,build){$('modalTitle').textContent=title;$('modalContent').replaceChildren();build($('modalContent'));$('modal').classList.remove('hidden')}
 function hideModal(){$('modal').classList.add('hidden')}
@@ -174,6 +174,7 @@ function editMeal(date,meal){
       names.forEach((name,i)=>{
         const r=el('div','item');
         r.append(el('span','item-main',name));
+        r.append(btn('🍳 簡単レシピ',()=>openRecipe(name,()=>editMeal(date,meal))));
         if(getDishIngredients(name).length){
           r.append(btn('食材を追加',()=>addDishIngredientsToShopping(name)));
         }
@@ -189,6 +190,74 @@ function editMeal(date,meal){
     const foot=el('div','actions');foot.append(btn('保存する',async()=>{state.menus[date]??={};state.menus[date][meal]=names;try{await persist();hideModal();renderCalendar()}catch(e){console.error(e)}},'action'));foot.append(btn('この食事を空にする',()=>{if(confirm('この食事の献立を削除しますか？')){names.length=0;draw()}},'action secondary'));root.append(foot);root.append(el('h3','section-title','毎週の繰り返し'));root.append(repeatBox);
   });
 }
+
+// AI簡単レシピ：生成済みレシピは端末に保存して再利用
+function openRecipe(dishName,onBack){
+  const cached=state.recipes?.[dishName];
+  let servings=2,recipe=cached||null;
+  function render(){
+    showModal('🍳 '+dishName+'の簡単レシピ',root=>{
+      const top=el('div','actions');
+      top.append(btn('← 戻る',()=>{if(onBack)onBack();else hideModal()},'action secondary'));
+      root.append(top);
+      const label=el('label','field','作る人数');
+      const select=el('select');
+      for(let n=1;n<=6;n++){const opt=el('option','',n+'人分');opt.value=n;select.append(opt)}
+      select.value=servings;
+      select.addEventListener('change',()=>{servings=Number(select.value);render()});
+      label.append(select);root.append(label);
+      if(!recipe){
+        root.append(el('p','hint','AIが材料と作り方を提案します。初回のみ通信が必要です。'));
+        const generate=btn('AIで簡単レシピを作る',()=>generateRecipe(generate),'action');root.append(generate);
+        return;
+      }
+      root.append(el('p','hint',`目安：${recipe.minutes}分 ／ AIが提案したレシピです。分量や加熱状態は確認してください。`));
+      root.append(el('h3','section-title','材料（'+servings+'人分）'));
+      const checks=[];
+      for(const item of recipe.ingredients){
+        const row=el('label','settings-row'),check=el('input');check.type='checkbox';check.checked=true;
+        const quantity=Number((item.amount*servings/recipe.baseServings).toFixed(2));
+        const text=item.name+' '+(quantity?quantity+' '+item.unit:item.unit||'適量');
+        row.append(el('span','',text),check);root.append(row);
+        checks.push({check,name:item.name,text});
+      }
+      root.append(el('h3','section-title','作り方'));
+      const steps=el('ol');
+      for(const step of recipe.steps)steps.append(el('li','',step));
+      root.append(steps);
+      const selected=()=>checks.filter(x=>x.check.checked);
+      const controls=el('div','actions');
+      controls.append(btn('選んだ材料を料理の食材に保存',async()=>{
+        const items=selected();if(!items.length)return alert('材料を選択してください');
+        let dish=state.dishes.find(x=>x.name===dishName);
+        if(!dish){dish={id:uid(),name:dishName,category:'その他',ingredients:[],memo:'',favorite:false,createdAt:Date.now()};state.dishes.unshift(dish)}
+        const existing=new Set(dish.ingredients.map(x=>normalizeIngredient(ingredientParts(x).name)));
+        for(const item of items){const k=normalizeIngredient(item.name);if(!existing.has(k)){dish.ingredients.push(item.text);existing.add(k)}}
+        try{await persist();alert('料理の食材に保存しました')}catch(e){console.error(e)}
+      },'action'));
+      controls.append(btn('選んだ材料を買い物リストへ',()=>{
+        const items=selected();if(!items.length)return alert('材料を選択してください');
+        selectShoppingIngredients('レシピの材料を買い物へ',items.map(x=>x.text));
+      },'action secondary'));
+      root.append(controls);
+      root.append(btn('別のレシピを再生成',()=>{if(confirm('別のレシピを生成しますか？ 通信が発生し、保存済みレシピが置き換わります。'))generateRecipe(null)},'mini'));
+    });
+  }
+  async function generateRecipe(button){
+    if(button){button.disabled=true;button.textContent='レシピを生成中…'}
+    else showModal('レシピ生成中',root=>root.append(el('p','','AIがレシピを考えています…')));
+    try{
+      const response=await fetch('/api/recipe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dishName})});
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error||'生成に失敗しました');
+      if(!Array.isArray(data.ingredients)||!Array.isArray(data.steps))throw Error('レシピの形式が不正です');
+      recipe=data;state.recipes??={};state.recipes[dishName]=recipe;
+      await persist();render();
+    }catch(e){console.error(e);render();alert('レシピを生成できませんでした。'+e.message)}
+  }
+  render();
+}
+
  function changeTab(next){tab=next;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('calendarScreen').classList.toggle('hidden',tab!=='calendar');$('otherScreen').classList.toggle('hidden',tab==='calendar');if(tab==='calendar')renderCalendar();else renderPanel()}
 function renderPanel(){const titles={dishes:'料理一覧',shopping:'買い物リスト',settings:'設定'};$('panelTitle').textContent=titles[tab];const root=$('panelContent');root.replaceChildren();if(tab==='dishes')renderDishes(root);if(tab==='shopping')renderShopping(root);if(tab==='settings')renderSettings(root)}
 const categories=['主食','主菜','副菜','汁物','麺類','その他'];
@@ -202,7 +271,7 @@ function renderDishes(root){
     if(!filtered.length)list.append(el('p','empty-note','該当する料理がありません。'));
     filtered.forEach(d=>{const r=el('div','item'),main=el('div','item-main');const history=dishHistory(d.name);main.append(el('strong','',d.name),el('small','',d.category+(d.ingredients.length?' ／ '+d.ingredients.join('、'):'')),el('small','',history.length?'最終献立：'+history[0]+'（記録 '+history.length+'日）':'献立履歴なし'));
       const fav=btn(d.favorite?'★':'☆',async()=>{d.favorite=!d.favorite;try{await persist();draw()}catch(e){console.error(e)}});fav.title='お気に入り';if(d.favorite)fav.classList.add('favorite');
-      r.append(main,fav,btn('編集',()=>editDish(d)),btn('削除',async()=>{if(!confirm(`「${d.name}」を料理一覧から削除しますか？\n過去の献立は残ります。`))return;state.dishes=state.dishes.filter(x=>x.id!==d.id);try{await persist();draw()}catch(e){console.error(e)}}));list.append(r)})}
+      r.append(main,fav,btn('🍳 簡単レシピ',()=>openRecipe(d.name,()=>renderPanel())),btn('編集',()=>editDish(d)),btn('削除',async()=>{if(!confirm(`「${d.name}」を料理一覧から削除しますか？\n過去の献立は残ります。`))return;state.dishes=state.dishes.filter(x=>x.id!==d.id);try{await persist();draw()}catch(e){console.error(e)}}));list.append(r)})}
   search.addEventListener('input',draw);toggle.addEventListener('change',draw);draw();
 }
 // 買い物の数量・単位・メモを独立管理（旧 quantity 文字列も表示可能）
