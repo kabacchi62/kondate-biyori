@@ -6,6 +6,17 @@
 
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.search{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:var(--card);color:var(--ink);font:inherit}.favorite{color:#dc9b26}.pill{font-size:11px;padding:4px 8px;background:var(--soft);border-radius:99px;color:var(--accent)}.group-head{background:var(--soft);padding:8px 11px;border-radius:10px;margin-top:12px}.history-item{padding:8px 0;border-bottom:1px solid var(--line)}
 .shopping-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.shopping-fields .field{min-width:0}.shopping-fields select{width:100%}.shopping-memo{display:block;color:var(--muted);font-size:12px;margin-top:4px;white-space:pre-wrap}
+/* iPhoneの入力時の自動ズームを防止 */
+input[type="text"],
+input[type="search"],
+textarea,
+select,
+.search,
+.field input,
+.field textarea,
+.field select {
+  font-size: 16px !important;
+}
 </style></head>
 <body><main class="app"><header class="top"><div><h1>こんだて日和 🌿</h1><p class="sub">毎日のごはんを、もっと気軽に。</p></div><button class="iconbtn" id="settingsTop" aria-label="設定を開く">⚙</button></header><section id="calendarScreen"><div class="period"><button class="navbtn" id="prev" aria-label="前へ">‹</button><strong id="periodText"></strong><button class="navbtn" id="next" aria-label="次へ">›</button></div><div class="switch"><button id="weekly" class="active">週間</button><button id="monthly">月間</button></div><div id="calendar"></div><p class="muted">食事の枠をタップすると献立を編集できます</p></section><section id="otherScreen" class="hidden"><div class="panel"><h2 id="panelTitle"></h2><div id="panelContent"></div></div></section></main><nav class="bottom" aria-label="メインメニュー"><button data-tab="calendar" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>献立表</button><button data-tab="dishes"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v17H6a2 2 0 0 0-2 2zM4 5v17M8 8h8M8 12h8"/></svg>料理一覧</button><button data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M3 4h2l3 12h11l2-9H6M9 21h.01M18 21h.01"/></svg>買い物</button><button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M10 2h4l1 3 3 1 3-1 2 4-2 2v3l2 2-2 4-3-1-3-1-1 2h-4l-1-2-3-1-3 1-2-4 2-2v-3L1 9l2-4 3 1 3-1z"/></svg>設定</button></nav><div class="modal hidden" id="modal" role="dialog" aria-modal="true"><div class="sheet"><button class="mini sheet-close" id="closeModal">閉じる ×</button><h2 id="modalTitle"></h2><div id="modalContent"></div></div></div>
 <script>
