@@ -94,24 +94,41 @@ function renderCalendar(){const root=$('calendar');root.replaceChildren();if(mod
 function updateMode(){$('weekly').classList.toggle('active',mode==='week');$('monthly').classList.toggle('active',mode==='month')}
 // コピー内容はページを開いている間だけ保持。保存データの形式は変更しない。
 let copiedMeal=null;
-function pasteMealInto(names,draw){
+function pasteMealInto(date,meal){
   if(!copiedMeal?.names?.length)return alert('先に献立をコピーしてください。');
   showModal('献立を貼り付け',root=>{
     root.append(el('p','hint',`コピー元：${copiedMeal.date} ${copiedMeal.meal}`));
     root.append(el('p','',`コピーした料理：${copiedMeal.names.join('・')}`));
-    root.append(el('p','hint','貼り付け先にある料理を置き換えるか、追加するか選んでください。'));
+    root.append(el('p','hint','上書き・追加を押すと、すぐに献立表へ保存・反映します。'));
     const actions=el('div','actions');
-    actions.append(btn('上書きする',()=>{names.splice(0,names.length,...copiedMeal.names);editPasteDone()},'action'));
-    actions.append(btn('追加する',()=>{names.push(...copiedMeal.names);editPasteDone()},'action secondary'));
+    async function applyPaste(replace){
+      const before=state.menus[date] ? structuredClone(state.menus[date]) : null;
+      const current=[...entry(date,meal)];
+      const incoming=[...copiedMeal.names];
+      state.menus[date]??={};
+      state.menus[date][meal]=replace?incoming:[...current,...incoming];
+      for(const button of actions.querySelectorAll('button'))button.disabled=true;
+      try{
+        await persist();
+        hideModal();
+        renderCalendar();
+        alert(replace?'献立を上書きして保存しました。':'献立を追加して保存しました。');
+      }catch(e){
+        if(before===null)delete state.menus[date];else state.menus[date]=before;
+        console.error(e);
+        for(const button of actions.querySelectorAll('button'))button.disabled=false;
+      }
+    }
+    actions.append(btn('上書きする',()=>applyPaste(true),'action'));
+    actions.append(btn('追加する',()=>applyPaste(false),'action secondary'));
     root.append(actions);
   });
-  function editPasteDone(){hideModal();draw();alert('貼り付けました。「保存する」を押すと献立表に反映されます。')}
 }
 function copyPreviousWeek(){const start=monday(anchor),source=plusDays(start,-7);if(!confirm('先週の献立を今週へコピーしますか？今週の登録済み献立は上書きされます。'))return;for(let i=0;i<7;i++){const dest=key(plusDays(start,i)),src=key(plusDays(source,i));state.menus[dest]??={};for(const meal of meals)state.menus[dest][meal]=[...entry(src,meal)]}persist().then(renderCalendar).catch(console.error)}
 function editMeal(date,meal){
   const names=[...entry(date,meal)];
   showModal(`${date}　${meal}`,root=>{
-    root.append(el('p','hint','料理を1品ずつ追加できます。保存すると献立表に反映されます。'));const copyActions=el('div','actions');copyActions.append(btn('献立をコピー',()=>{if(!names.length)return alert('コピーする料理がありません。');copiedMeal={date,meal,names:[...names]};alert('献立をコピーしました。貼り付け先の食事を開いてください。')},'action secondary'));const pasteButton=btn('貼り付け',()=>pasteMealInto(names,draw),'action secondary');if(!copiedMeal?.names?.length)pasteButton.disabled=true;copyActions.append(pasteButton);root.append(copyActions);
+    root.append(el('p','hint','料理を1品ずつ追加できます。保存すると献立表に反映されます。'));const copyActions=el('div','actions');copyActions.append(btn('献立をコピー',()=>{if(!names.length)return alert('コピーする料理がありません。');copiedMeal={date,meal,names:[...names]};alert('献立をコピーしました。貼り付け先の食事を開いてください。')},'action secondary'));const pasteButton=btn('貼り付け',()=>pasteMealInto(date,meal),'action secondary');if(!copiedMeal?.names?.length)pasteButton.disabled=true;copyActions.append(pasteButton);root.append(copyActions);
     const list=el('div');root.append(list);
     function draw(){
       list.replaceChildren();
