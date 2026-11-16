@@ -9,7 +9,7 @@ export async function onRequestPost({ request, env }) {
       method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':env.GEMINI_API_KEY},
       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.4,maxOutputTokens:1800}})
     });
-    if (!upstream.ok) { console.error('Gemini HTTP status',upstream.status); return Response.json({error:'AIサービスに接続できませんでした（'+upstream.status+'）'}, {status:502}); }
+    if (!upstream.ok) {   const detail = await upstream.text();   console.error('Gemini API error:', upstream.status, detail);   return Response.json({     error: 'AIサービスでエラーが発生しました（' + upstream.status + '）'   }, { status: 502 }); }
     const raw=await upstream.json();
     const text=raw.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('');
     if (!text) throw Error('Empty model response');
