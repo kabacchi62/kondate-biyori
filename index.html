@@ -1,4 +1,3 @@
-```
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6faf5"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><title>こんだて日和 | 献立カレンダー</title>
 <style>
@@ -6,17 +5,21 @@
 
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.search{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:var(--card);color:var(--ink);font:inherit}.favorite{color:#dc9b26}.pill{font-size:11px;padding:4px 8px;background:var(--soft);border-radius:99px;color:var(--accent)}.group-head{background:var(--soft);padding:8px 11px;border-radius:10px;margin-top:12px}.history-item{padding:8px 0;border-bottom:1px solid var(--line)}
 .shopping-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.shopping-fields .field{min-width:0}.shopping-fields select{width:100%}.shopping-memo{display:block;color:var(--muted);font-size:12px;margin-top:4px;white-space:pre-wrap}
-/* iPhoneの入力時の自動ズームを防止 */
-input[type="text"],
-input[type="search"],
-textarea,
-select,
-.search,
-.field input,
-.field textarea,
-.field select {
-  font-size: 16px !important;
-}
+
+/* iPhone input zoom prevention */
+input[type="text"],input[type="search"],textarea,select,.search,.field input,.field textarea,.field select{font-size:16px!important}
+/* First-run tutorial */
+.tutorial-overlay{position:fixed;inset:0;z-index:100;background:rgba(29,48,43,.72);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+.tutorial-card{width:min(100%,400px);background:var(--card);color:var(--ink);border-radius:25px;padding:26px 22px 22px;text-align:center;box-shadow:0 18px 60px #0003}
+.tutorial-picture{font-size:70px;line-height:1.5;background:var(--soft);border-radius:22px;margin:12px auto 20px;max-width:230px;padding:12px}
+.tutorial-card h2{font-size:21px;color:var(--accent);margin:10px 0}
+.tutorial-card p{font-size:15px;line-height:1.8;min-height:58px;margin:12px 0 18px}
+.tutorial-dots{display:flex;justify-content:center;gap:9px;margin:18px 0}
+.tutorial-dot{width:8px;height:8px;border-radius:99px;background:var(--line)}
+.tutorial-dot.active{background:var(--accent);width:22px}
+.tutorial-buttons{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}
+.tutorial-buttons button{min-width:80px}
+.tutorial-skip{border:0;background:transparent;color:var(--muted);font-size:13px;padding:12px;margin-top:8px}
 </style></head>
 <body><main class="app"><header class="top"><div><h1>こんだて日和 🌿</h1><p class="sub">毎日のごはんを、もっと気軽に。</p></div><button class="iconbtn" id="settingsTop" aria-label="設定を開く">⚙</button></header><section id="calendarScreen"><div class="period"><button class="navbtn" id="prev" aria-label="前へ">‹</button><strong id="periodText"></strong><button class="navbtn" id="next" aria-label="次へ">›</button></div><div class="switch"><button id="weekly" class="active">週間</button><button id="monthly">月間</button></div><div id="calendar"></div><p class="muted">食事の枠をタップすると献立を編集できます</p></section><section id="otherScreen" class="hidden"><div class="panel"><h2 id="panelTitle"></h2><div id="panelContent"></div></div></section></main><nav class="bottom" aria-label="メインメニュー"><button data-tab="calendar" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>献立表</button><button data-tab="dishes"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v17H6a2 2 0 0 0-2 2zM4 5v17M8 8h8M8 12h8"/></svg>料理一覧</button><button data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M3 4h2l3 12h11l2-9H6M9 21h.01M18 21h.01"/></svg>買い物</button><button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M10 2h4l1 3 3 1 3-1 2 4-2 2v3l2 2-2 4-3-1-3-1-1 2h-4l-1-2-3-1-3 1-2-4 2-2v-3L1 9l2-4 3 1 3-1z"/></svg>設定</button></nav><div class="modal hidden" id="modal" role="dialog" aria-modal="true"><div class="sheet"><button class="mini sheet-close" id="closeModal">閉じる ×</button><h2 id="modalTitle"></h2><div id="modalContent"></div></div></div>
 <script>
@@ -288,10 +291,36 @@ async function exportBackup(){try{await saveQueue;const payload={app:'kondate-bi
 const isRecord=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 function validateBackup(payload){if(!isRecord(payload)||payload.app!=='kondate-biyori'||payload.formatVersion!==1||!isRecord(payload.data))throw new Error('こんだて日和の対応するバックアップファイルではありません。');const d=payload.data;if(!isRecord(d.menus)||!Array.isArray(d.dishes)||!Array.isArray(d.shopping)||!isRecord(d.settings))throw new Error('バックアップの基本データが不正です。');for(const [date,day] of Object.entries(d.menus)){if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!isRecord(day))throw new Error('献立の日付データが不正です。');for(const [meal,names] of Object.entries(day)){if(!meals.includes(meal)||!Array.isArray(names)||!names.every(x=>typeof x==='string'))throw new Error('献立データが不正です。')}}for(const dish of d.dishes){if(!isRecord(dish)||typeof dish.id!=='string'||typeof dish.name!=='string'||typeof dish.category!=='string'||!Array.isArray(dish.ingredients)||!dish.ingredients.every(x=>typeof x==='string')||typeof dish.memo!=='string')throw new Error('料理データが不正です。')}for(const item of d.shopping){if(!isRecord(item)||typeof item.id!=='string'||typeof item.name!=='string'||typeof item.quantity!=='string'||typeof item.done!=='boolean')throw new Error('買い物データが不正です。')}const s=d.settings;if(!Array.isArray(s.visible)||s.visible.length!==3||!s.visible.every(x=>typeof x==='boolean')||!s.visible.some(Boolean)||!['auto','light','dark'].includes(s.theme)||!['green','orange','pink','blue','purple','brown'].includes(s.color))throw new Error('設定データが不正です。');return structuredClone(d)}
 async function importBackup(file){if(!file)return;try{if(file.size>10*1024*1024)throw new Error('ファイルが大きすぎます（上限10MB）。');const text=await file.text();const data=validateBackup(JSON.parse(text));const mealCount=Object.values(data.menus).reduce((sum,day)=>sum+Object.values(day).reduce((n,arr)=>n+arr.length,0),0);const message=`バックアップを復元しますか？\n\n献立：${mealCount}品\n登録料理：${data.dishes.length}件\n買い物：${data.shopping.length}件\n\n現在の献立・料理・買い物・設定は、バックアップの内容で上書きされます。元に戻せません。`;if(!confirm(message))return;await saveQueue;await writeSnapshot(data);state=data;applyTheme();hideModal();changeTab('settings');alert('バックアップを復元しました。')}catch(e){console.error(e);alert('復元できませんでした。\n'+(e instanceof SyntaxError?'JSONファイルの形式が正しくありません。':e.message||'ファイルを確認してください。'))}}
-function renderSettings(root){root.append(el('p','hint','変更内容はこの端末に自動保存されます。'));root.append(el('h3','section-title','献立表に表示する食事'));meals.forEach((m,i)=>{const row=el('label','settings-row');row.append(el('span','',m));const check=el('input');check.type='checkbox';check.checked=state.settings.visible[i];check.addEventListener('change',async()=>{if(!check.checked&&state.settings.visible.filter(Boolean).length===1){check.checked=true;return alert('少なくとも1つの食事を表示してください')}state.settings.visible[i]=check.checked;try{await persist();renderCalendar()}catch(e){console.error(e)}});row.append(check);root.append(row)});root.append(el('h3','section-title','見た目'));settingSelect(root,'テーマ',[['auto','端末に合わせる'],['light','ライト'],['dark','ダーク']],state.settings.theme,async v=>{state.settings.theme=v;applyTheme();try{await persist()}catch(e){console.error(e)}});settingSelect(root,'アクセントカラー',[['green','グリーン'],['orange','オレンジ'],['pink','ピンク'],['blue','ブルー'],['purple','パープル'],['brown','ブラウン']],state.settings.color,async v=>{state.settings.color=v;applyTheme();try{await persist()}catch(e){console.error(e)}});
+const tutorialSteps=[
+  {picture:'🍚 🌿',title:'こんだて日和へようこそ！',description:'毎日のごはんを、もっと気軽に。献立も買い物も、ここでまとめて管理できます。'},
+  {picture:'📅 🍳',title:'献立を登録しよう',description:'献立表の日付をタップ！朝食・昼食・夕食に、食べたい料理を登録できます。'},
+  {picture:'📖 🥕',title:'料理を登録しよう',description:'料理一覧によく作る料理や食材を登録すると、献立を考えるときに便利です。'},
+  {picture:'🛒 🥬',title:'買い物もラクラク！',description:'料理や1週間の献立から、必要な食材を選んで買い物リストに追加できます。'}
+];
+function openTutorial(){
+  if(document.getElementById('tutorialOverlay'))return;
+  let current=0;
+  const overlay=el('div','tutorial-overlay');overlay.id='tutorialOverlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','こんだて日和の使い方');
+  const card=el('div','tutorial-card');overlay.append(card);document.body.append(overlay);
+  function finish(){try{localStorage.setItem('kondate-tutorial-completed','1')}catch(e){console.warn(e)}overlay.remove()}
+  function draw(){
+    const step=tutorialSteps[current];card.replaceChildren();
+    card.append(el('div','hint',`使い方ガイド　${current+1} / ${tutorialSteps.length}`));
+    card.append(el('div','tutorial-picture',step.picture));
+    card.append(el('h2','',step.title));card.append(el('p','',step.description));
+    const dots=el('div','tutorial-dots');tutorialSteps.forEach((_,i)=>dots.append(el('span','tutorial-dot'+(i===current?' active':''))));card.append(dots);
+    const buttons=el('div','tutorial-buttons');
+    if(current>0)buttons.append(btn('戻る',()=>{current--;draw()},'action secondary'));
+    buttons.append(btn(current===tutorialSteps.length-1?'はじめる！':'次へ',()=>{if(current===tutorialSteps.length-1)finish();else{current++;draw()}},'action'));
+    card.append(buttons);card.append(btn('スキップ',finish,'tutorial-skip'));
+  }
+  draw();
+}
+function renderSettings(root){
+  const guide=el('div','actions');guide.append(btn('📖 使い方ガイドを見る',openTutorial,'action secondary'));root.append(guide);
+root.append(el('p','hint','変更内容はこの端末に自動保存されます。'));root.append(el('h3','section-title','献立表に表示する食事'));meals.forEach((m,i)=>{const row=el('label','settings-row');row.append(el('span','',m));const check=el('input');check.type='checkbox';check.checked=state.settings.visible[i];check.addEventListener('change',async()=>{if(!check.checked&&state.settings.visible.filter(Boolean).length===1){check.checked=true;return alert('少なくとも1つの食事を表示してください')}state.settings.visible[i]=check.checked;try{await persist();renderCalendar()}catch(e){console.error(e)}});row.append(check);root.append(row)});root.append(el('h3','section-title','見た目'));settingSelect(root,'テーマ',[['auto','端末に合わせる'],['light','ライト'],['dark','ダーク']],state.settings.theme,async v=>{state.settings.theme=v;applyTheme();try{await persist()}catch(e){console.error(e)}});settingSelect(root,'アクセントカラー',[['green','グリーン'],['orange','オレンジ'],['pink','ピンク'],['blue','ブルー'],['purple','パープル'],['brown','ブラウン']],state.settings.color,async v=>{state.settings.color=v;applyTheme();try{await persist()}catch(e){console.error(e)}});
 const section=el('div','backup-area');section.append(el('h3','section-title','バックアップ・復元'));section.append(el('p','hint','献立・料理一覧・買い物リスト・設定を1つのJSONファイルに保存できます。iPhoneでは「ファイル」やiCloud Driveに保存してください。'));const controls=el('div','actions');controls.append(btn('バックアップを保存',exportBackup,'action'));const fileInput=el('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.className='hidden';fileInput.addEventListener('change',async()=>{const file=fileInput.files?.[0];fileInput.value='';await importBackup(file)});controls.append(btn('バックアップから復元',()=>fileInput.click(),'action secondary'));section.append(controls,fileInput);section.append(el('p','hint','復元すると現在のデータは上書きされます。先に現在のバックアップを保存することをおすすめします。'));root.append(section);renderRecurring(root);root.append(el('p','hint','v0.7：端末内に自動保存。バックアップは手動で作成してください。'))}
 $('prev').addEventListener('click',()=>{anchor=mode==='week'?plusDays(anchor,-7):new Date(anchor.getFullYear(),anchor.getMonth()-1,1);renderCalendar()});$('next').addEventListener('click',()=>{anchor=mode==='week'?plusDays(anchor,7):new Date(anchor.getFullYear(),anchor.getMonth()+1,1);renderCalendar()});$('weekly').addEventListener('click',()=>{mode='week';updateMode();renderCalendar()});$('monthly').addEventListener('click',()=>{mode='month';updateMode();renderCalendar()});document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>changeTab(b.dataset.tab)));$('settingsTop').addEventListener('click',()=>changeTab('settings'));$('closeModal').addEventListener('click',hideModal);$('modal').addEventListener('click',e=>{if(e.target===$('modal'))hideModal()});if(matchMedia('(prefers-color-scheme: dark)').addEventListener)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
-initDB().then(()=>{applyTheme();renderCalendar()}).catch(e=>{console.error(e);alert('データ保存の初期化に失敗しました。Safariのプライベートブラウズ設定などを確認してください。');applyTheme();renderCalendar()});
+initDB().then(()=>{applyTheme();renderCalendar();try{if(localStorage.getItem('kondate-tutorial-completed')!=='1')openTutorial()}catch(e){openTutorial()}}).catch(e=>{console.error(e);alert('データ保存の初期化に失敗しました。Safariのプライベートブラウズ設定などを確認してください。');applyTheme();renderCalendar()});
 })();
 </script></body></html>
-`
