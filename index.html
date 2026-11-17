@@ -265,7 +265,7 @@ function openRecipe(dishName,onBack){
   ));
   return;
 }
-      root.append(el('p','hint',`目安：${recipe.minutes}分 ／ ${state.recipes?.[dishName]?'AI生成・保存済み':'定番レシピ'}。分量や加熱状態は確認してください。`));
+      root.append(el('p','hint',`目安：${recipe.minutes}分 ／ ${state.recipes?.[dishName]?'保存済みレシピ':'定番レシピ'}。分量や加熱状態は確認してください。`));
       root.append(el('h3','section-title','材料（'+servings+'人分）'));
       const checks=[];
       for(const item of recipe.ingredients){
