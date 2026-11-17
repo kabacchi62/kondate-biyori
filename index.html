@@ -41,7 +41,7 @@ let standardRecipes={},standardRecipesError='';
 let dishesView='home';let dishFilter='all';
 async function loadStandardRecipes(){
   try{
-    const response=await fetch('/kondate-standard-recipes-50.json');
+    const response=await fetch('/recipes.json');
     if(!response.ok)throw new Error('HTTP '+response.status);
     const payload=await response.json();
     if(!Array.isArray(payload.recipes))throw new Error('レシピ形式が不正です');
