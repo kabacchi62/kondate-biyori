@@ -209,9 +209,15 @@ function editMeal(date,meal){
     const footer=el('div','actions');
     saveButton=btn('選んだ'+names.length+'品を保存する',async()=>{
       const before=state.menus[date]?structuredClone(state.menus[date]):null;
+      const oldDishes=state.dishes;
+      const newDishes=[...new Set(names)].filter(name=>
+        !standardRecipes[name]&&!state.recipes?.[name]&&!state.dishes.some(d=>d.name===name)
+      ).map(name=>({id:uid(),name,category:'その他',ingredients:[],memo:'',favorite:false,createdAt:Date.now()}));
       state.menus[date]??={};state.menus[date][meal]=[...names];
+      if(newDishes.length)state.dishes=[...newDishes,...state.dishes];
+      saveButton.disabled=true;
       try{await persist();hideModal();renderCalendar();if(tab==='home')renderHome()}
-      catch(e){if(before===null)delete state.menus[date];else state.menus[date]=before;console.error(e)}
+      catch(e){if(before===null)delete state.menus[date];else state.menus[date]=before;state.dishes=oldDishes;saveButton.disabled=false;console.error(e)}
     },'action');footer.append(saveButton);
     footer.append(btn('選択をすべて解除',()=>{names.length=0;drawSelected();drawResults()},'action secondary'));
     root.append(footer);
@@ -274,14 +280,6 @@ function openRecipe(dishName,onBack){
       root.append(steps);
       const selected=()=>checks.filter(x=>x.check.checked);
       const controls=el('div','actions');
-      controls.append(btn('料理一覧に登録',async()=>{
-        const items=selected();if(!items.length)return alert('材料を選択してください');
-        let dish=state.dishes.find(x=>x.name===dishName);
-        if(!dish){dish={id:uid(),name:dishName,category:'その他',ingredients:[],memo:'',favorite:false,createdAt:Date.now()};state.dishes.unshift(dish)}
-        const existing=new Set(dish.ingredients.map(x=>normalizeIngredient(ingredientParts(x).name)));
-        for(const item of items){const k=normalizeIngredient(item.name);if(!existing.has(k)){dish.ingredients.push(item.text);existing.add(k)}}
-        try{await persist();alert('料理一覧に登録しました')}catch(e){console.error(e)}
-      },'action'));
       controls.append(btn('選んだ材料を買い物リストへ',()=>{
         const items=selected();if(!items.length)return alert('材料を選択してください');
         selectShoppingIngredients('レシピの材料を買い物へ',items.map(x=>x.text));
@@ -337,7 +335,7 @@ function renderRecipeBook(root,filter='all'){
       const main=el('button','recipe-row-main');main.type='button';
       main.append(el('strong','',name),el('small','',`${recipe.category||'その他'} ／ 約${recipe.minutes||'?'}分 ／ ${own[name]?'自分の保存レシピ':'定番レシピ'}`));
       main.addEventListener('click',()=>openRecipe(name,()=>renderPanel()));
-      row.append(main);addFavoriteButton(row,name,draw);row.append(btn('見る',()=>openRecipe(name,()=>renderPanel())),btn('献立に追加',()=>addToCalendar(name)));
+      row.append(main);addFavoriteButton(row,name,draw);row.append(btn('レシピ',()=>openRecipe(name,()=>renderPanel())),btn('献立に追加',()=>addToCalendar(name)));
       if(own[name])row.append(btn('削除',async()=>{
         if(!confirm(`「${name}」の個人用レシピを削除しますか？${standardRecipes[name]?' 削除後は定番レシピに戻ります。':''}`))return;
         const old=own[name];delete own[name];
