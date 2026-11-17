@@ -187,7 +187,7 @@ function editMeal(date,meal){
       if(saveButton)saveButton.textContent='選んだ'+names.length+'品を保存する';
       selectedBox.replaceChildren();
       if(!names.length)selectedBox.append(el('p','empty-note','料理を選んでください'));
-      names.forEach((name,i)=>selectedBox.append(btn(name+' ×',()=>{names.splice(i,1);drawSelected();drawResults()},'dish-chip')));
+      names.forEach((name,i)=>{   const row=el('div','item');   row.append(     el('span','item-main',name),     btn('削除',()=>{       names.splice(i,1);       drawSelected();       drawResults();     },'mini')   );   selectedBox.append(row); });
     }
     function drawResults(){
       results.replaceChildren();const q=search.value.trim().toLocaleLowerCase();
