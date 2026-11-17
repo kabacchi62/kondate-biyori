@@ -289,18 +289,7 @@ function openRecipe(dishName,onBack){
 
     });
   }
-  async function generateRecipe(button){
-    if(button){button.disabled=true;button.textContent='レシピを生成中…'}
-    else showModal('レシピ生成中',root=>root.append(el('p','','AIがレシピを考えています…')));
-    try{
-      const response=await fetch('/api/recipe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dishName})});
-      const data=await response.json();
-      if(!response.ok)throw Error(data.error||'生成に失敗しました');
-      if(!Array.isArray(data.ingredients)||!Array.isArray(data.steps))throw Error('レシピの形式が不正です');
-      recipe=data;state.recipes??={};state.recipes[dishName]=recipe;
-      await persist();render();
-    }catch(e){console.error(e);render();alert('レシピを生成できませんでした。'+e.message)}
-  }
+
   render();
 }
 
