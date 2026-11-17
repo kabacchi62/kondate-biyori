@@ -29,16 +29,16 @@ input[type="text"],input[type="search"],textarea,select,.search,.field input,.fi
 .recipe-row-main strong,.recipe-row-main small{display:block}.recipe-row-main small{color:var(--muted);margin-top:5px;font-size:12px}
 .recipe-filter{width:100%;font-size:16px;padding:11px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin:9px 0}
 .hub-card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 14px;margin:12px 0}.hub-card .hint{margin:4px 0}.hub-choice{width:100%;border:0;background:transparent;text-align:left;color:var(--accent);font:inherit;font-size:17px;font-weight:700;padding:8px 0;cursor:pointer}.ingredient-result{border:1px solid var(--line);border-radius:13px;padding:13px;margin:10px 0;background:var(--card)}.ingredient-result small{display:block;color:var(--muted);margin-top:5px}.ingredient-result .actions{margin-bottom:0}
-</style></head>
-<body><main class="app"><header class="top"><div><h1>こんだて日和 🌿</h1><p class="sub">毎日のごはんを、もっと気軽に。</p></div><button class="iconbtn" id="settingsTop" aria-label="設定を開く">⚙</button></header><section id="calendarScreen"><div class="period"><button class="navbtn" id="prev" aria-label="前へ">‹</button><strong id="periodText"></strong><button class="navbtn" id="next" aria-label="次へ">›</button></div><div class="switch"><button id="weekly" class="active">週間</button><button id="monthly">月間</button></div><div id="calendar"></div><p class="muted">食事の枠をタップすると献立を編集できます</p></section><section id="otherScreen" class="hidden"><div class="panel"><h2 id="panelTitle"></h2><div id="panelContent"></div></div></section></main><nav class="bottom" aria-label="メインメニュー"><button data-tab="calendar" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>献立表</button><button data-tab="dishes"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v17H6a2 2 0 0 0-2 2zM4 5v17M8 8h8M8 12h8"/></svg>料理一覧</button><button data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M3 4h2l3 12h11l2-9H6M9 21h.01M18 21h.01"/></svg>買い物</button><button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M10 2h4l1 3 3 1 3-1 2 4-2 2v3l2 2-2 4-3-1-3-1-1 2h-4l-1-2-3-1-3 1-2-4 2-2v-3L1 9l2-4 3 1 3-1z"/></svg>設定</button></nav><div class="modal hidden" id="modal" role="dialog" aria-modal="true"><div class="sheet"><button class="mini sheet-close" id="closeModal">閉じる ×</button><h2 id="modalTitle"></h2><div id="modalContent"></div></div></div>
+.home-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 14px}.home-heading h2,.home-section-title{font-size:19px;margin:0 0 14px}.home-today{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:24px}.home-meal{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}.home-meal-label{color:var(--muted);font-size:12px;min-width:35px}.home-meal-value{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}.home-primary{width:100%;margin-top:14px}.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:18px}.home-tile{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:17px 12px;text-align:left;display:flex;flex-direction:column;gap:7px;cursor:pointer}.home-tile-icon{font-size:24px}.home-tile strong{font-size:14px}.home-tile small{font-size:11px;color:var(--muted)}.heart-btn{font-size:21px;min-width:40px}.heart-btn.is-fav{color:#c75d70}.recipe-row{flex-wrap:wrap}.recipe-row-main{flex-basis:52%}.recipe-row .mini{white-space:nowrap}.recipe-tabs button{font-size:13px}.panel{padding:18px 13px}</style></head>
+<body><main class="app"><header class="top"><div><h1>こんだて日和 🌿</h1><p class="sub">毎日のごはんを、もっと気軽に。</p></div><button class="iconbtn" id="settingsTop" aria-label="設定を開く">⚙</button></header><section id="homeScreen"></section><section id="calendarScreen"><div class="period"><button class="navbtn" id="prev" aria-label="前へ">‹</button><strong id="periodText"></strong><button class="navbtn" id="next" aria-label="次へ">›</button></div><div class="switch"><button id="weekly" class="active">週間</button><button id="monthly">月間</button></div><div id="calendar"></div><p class="muted">食事の枠をタップすると献立を編集できます</p></section><section id="otherScreen" class="hidden"><div class="panel"><h2 id="panelTitle"></h2><div id="panelContent"></div></div></section></main><nav class="bottom" aria-label="メインメニュー"><button data-tab="home" class="active"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v11H3zM9 21v-7h6v7"/></svg>ホーム</button><button data-tab="dishes"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v17H6a2 2 0 0 0-2 2zM4 5v17M8 8h8M8 12h8"/></svg>料理</button><button data-tab="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>カレンダー</button><button data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M3 4h2l3 12h11l2-9H6M9 21h.01M18 21h.01"/></svg>買い物</button></nav><div class="modal hidden" id="modal" role="dialog" aria-modal="true"><div class="sheet"><button class="mini sheet-close" id="closeModal">閉じる ×</button><h2 id="modalTitle"></h2><div id="modalContent"></div></div></div>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),days=['日','月','火','水','木','金','土'],meals=['朝食','昼食','夕食'],today=new Date();today.setHours(12,0,0,0);
-let anchor=new Date(today),mode='week',tab='calendar',db=null,saveQueue=Promise.resolve();
+let anchor=new Date(today),mode='week',tab='home',db=null,saveQueue=Promise.resolve();
 const defaults=()=>({menus:{},dishes:[],shopping:[],recipes:{},recurring:{},settings:{visible:[true,true,true],theme:'auto',color:'green'}});
 let state=defaults();
 let standardRecipes={},standardRecipesError='';
-let dishesView='home';
+let dishesView='home';let dishFilter='all';
 async function loadStandardRecipes(){
   try{
     const response=await fetch('/kondate-standard-recipes-50.json');
@@ -50,7 +50,7 @@ async function loadStandardRecipes(){
     standardRecipes=Object.fromEntries(valid.map(r=>[r.name,r]));
     standardRecipesError='';
   }catch(e){console.error(e);standardRecipesError='定番レシピを読み込めませんでした。通信状況を確認して再読み込みしてください。'}
-  if(tab==='dishes'&&['recipes','ingredients'].includes(dishesView))renderPanel();
+  if(tab==='dishes')renderPanel();
 }
 
 const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -212,7 +212,7 @@ function editMeal(date,meal){
     const [wrap,input]=field('料理名を入力');input.placeholder='例：肉じゃが';root.append(wrap);
     const actions=el('div','actions');actions.append(btn('料理を追加',()=>{const v=input.value.trim();if(!v)return alert('料理名を入力してください');names.push(v);input.value='';draw()},'action secondary'));root.append(actions);
     if(state.dishes.length){root.append(el('h3','section-title','登録済み料理から追加'));const search=el('input','search');search.placeholder='料理名で検索';root.append(search);const chips=el('div');root.append(chips);function updateChips(){chips.replaceChildren();state.dishes.filter(d=>d.name.toLowerCase().includes(search.value.toLowerCase())).sort((a,b)=>Number(!!b.favorite)-Number(!!a.favorite)).forEach(d=>chips.append(btn((d.favorite?'★ ':'＋ ')+d.name,()=>{names.push(d.name);draw()},'dish-chip')))}search.addEventListener('input',updateChips);updateChips()}
-    const foot=el('div','actions');foot.append(btn('保存する',async()=>{state.menus[date]??={};state.menus[date][meal]=names;try{await persist();hideModal();renderCalendar()}catch(e){console.error(e)}},'action'));foot.append(btn('この食事を空にする',()=>{if(confirm('この食事の献立を削除しますか？')){names.length=0;draw()}},'action secondary'));root.append(foot);root.append(el('h3','section-title','毎週の繰り返し'));root.append(repeatBox);
+    const foot=el('div','actions');foot.append(btn('保存する',async()=>{state.menus[date]??={};state.menus[date][meal]=names;try{await persist();hideModal();renderCalendar();if(tab==='home')renderHome()}catch(e){console.error(e)}},'action'));foot.append(btn('この食事を空にする',()=>{if(confirm('この食事の献立を削除しますか？')){names.length=0;draw()}},'action secondary'));root.append(foot);root.append(el('h3','section-title','毎週の繰り返し'));root.append(repeatBox);
   });
 }
 
@@ -224,7 +224,7 @@ function openRecipe(dishName,onBack){
     showModal('🍳 '+dishName+'の簡単レシピ',root=>{
       const top=el('div','actions');
       top.append(btn('← 戻る',()=>{if(onBack)onBack();else hideModal()},'action secondary'));
-      root.append(top);
+      root.append(top);const quick=el('div','actions');addFavoriteButton(quick,dishName,render);quick.append(btn('📅 献立に追加',()=>addToCalendar(dishName),'action'));root.append(quick);
       const label=el('label','field','作る人数');
       const select=el('select');
       for(let n=1;n<=6;n++){const opt=el('option','',n+'人分');opt.value=n;select.append(opt)}
@@ -252,13 +252,13 @@ function openRecipe(dishName,onBack){
       root.append(steps);
       const selected=()=>checks.filter(x=>x.check.checked);
       const controls=el('div','actions');
-      controls.append(btn('選んだ材料を料理の食材に保存',async()=>{
+      controls.append(btn('料理一覧に登録',async()=>{
         const items=selected();if(!items.length)return alert('材料を選択してください');
         let dish=state.dishes.find(x=>x.name===dishName);
         if(!dish){dish={id:uid(),name:dishName,category:'その他',ingredients:[],memo:'',favorite:false,createdAt:Date.now()};state.dishes.unshift(dish)}
         const existing=new Set(dish.ingredients.map(x=>normalizeIngredient(ingredientParts(x).name)));
         for(const item of items){const k=normalizeIngredient(item.name);if(!existing.has(k)){dish.ingredients.push(item.text);existing.add(k)}}
-        try{await persist();alert('料理の食材に保存しました')}catch(e){console.error(e)}
+        try{await persist();alert('料理一覧に登録しました')}catch(e){console.error(e)}
       },'action'));
       controls.append(btn('選んだ材料を買い物リストへ',()=>{
         const items=selected();if(!items.length)return alert('材料を選択してください');
@@ -283,14 +283,19 @@ function openRecipe(dishName,onBack){
   render();
 }
 
- function changeTab(next){tab=next;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('calendarScreen').classList.toggle('hidden',tab!=='calendar');$('otherScreen').classList.toggle('hidden',tab==='calendar');if(tab==='calendar')renderCalendar();else renderPanel()}
-function renderPanel(){const titles={dishes:'料理一覧',shopping:'買い物リスト',settings:'設定'};$('panelTitle').textContent=titles[tab];const root=$('panelContent');root.replaceChildren();if(tab==='dishes')renderDishes(root);if(tab==='shopping')renderShopping(root);if(tab==='settings')renderSettings(root)}
-const categories=['主食','主菜','副菜','汁物','麺類','その他'];
+function changeTab(next){tab=next;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('homeScreen').classList.toggle('hidden',tab!=='home');$('calendarScreen').classList.toggle('hidden',tab!=='calendar');$('otherScreen').classList.toggle('hidden',tab==='calendar'||tab==='home');if(tab==='home')renderHome();else if(tab==='calendar')renderCalendar();else renderPanel()}
+function renderHome(){const root=$('homeScreen');root.replaceChildren();const heading=el('div','home-heading');heading.append(el('h2','','今日の献立'),el('span','pill',fmt(today)+'（'+days[today.getDay()]+'）'));root.append(heading);const card=el('div','home-today');for(const meal of meals){const row=el('div','home-meal'),names=entry(key(today),meal);row.append(el('span','home-meal-label',meal),el('span','home-meal-value',names.length?names.join('・'):'まだ決まっていません'),btn('編集',()=>editMeal(key(today),meal),'mini'));card.append(row)}card.append(btn('＋ 今日の献立を決める',()=>{dishFilter='all';changeTab('dishes')},'action home-primary'));root.append(card);root.append(el('h2','home-section-title','料理を選ぶ'));const grid=el('div','home-grid');for(const [icon,label,desc,target] of [['🍳','すべての料理','300品から探す','all'],['♡','お気に入り','好きな料理を保存','favorites'],['🥕','材料から探す','冷蔵庫の材料で探す','ingredients'],['📝','自分の料理','我が家の料理を登録','mine']]){const b=btn('',()=>{dishFilter=target;changeTab('dishes')},'home-tile');b.append(el('span','home-tile-icon',icon),el('strong','',label),el('small','',desc));grid.append(b)}root.append(grid);root.append(btn('📅 カレンダーで献立を確認',()=>changeTab('calendar'),'action secondary home-primary'))}
+function renderPanel(){const titles={dishes:'料理を探す',shopping:'買い物リスト',settings:'設定'};$('panelTitle').textContent=titles[tab]||'';const root=$('panelContent');root.replaceChildren();if(tab==='dishes')renderDishes(root);if(tab==='shopping')renderShopping(root);if(tab==='settings')renderSettings(root)}
+const categories=['主食','ご飯・丼','主菜','副菜','汁物','麺類','その他'];
 function editDish(dish=null){showModal(dish?'料理を編集':'料理を登録',root=>{const [w1,name]=field('料理名（必須）',dish?.name||'');root.append(w1);const label=el('label','field','カテゴリ');const select=el('select');categories.forEach(c=>{const opt=el('option','',c);opt.value=c;select.append(opt)});select.value=dish?.category||'その他';label.append(select);root.append(label);const [w2,ingredients]=field('食材（任意・カンマ区切り）',(dish?.ingredients||[]).join('、'));ingredients.placeholder='例：じゃがいも 3個、豚肉 200g';root.append(el('p','hint','数量を登録する場合は「玉ねぎ 2個」のように食材名と数量を空白で区切ってください。')); root.append(w2);const [w3,memo]=field('メモ（任意）',dish?.memo||'');root.append(w3);root.append(btn('保存する',async()=>{const v=name.value.trim();if(!v)return alert('料理名を入力してください');const data={id:dish?.id||uid(),name:v,category:select.value,ingredients:ingredients.value.split(/[、,，\n]/).map(x=>x.trim()).filter(Boolean),memo:memo.value.trim(),favorite:!!dish?.favorite,createdAt:dish?.createdAt||Date.now()};if(dish){const i=state.dishes.findIndex(x=>x.id===dish.id);if(i<0)return alert('料理が見つかりません');state.dishes[i]=data}else state.dishes.unshift(data);try{await persist();hideModal();renderPanel()}catch(e){console.error(e)}},'action'))})}
-function renderRecipeBook(root){
+function recipeFavorites(){return Array.isArray(state.settings.recipeFavorites)?state.settings.recipeFavorites:[]}
+function isFavoriteName(name){return recipeFavorites().includes(name)||state.dishes.some(d=>d.name===name&&d.favorite)}
+async function toggleRecipeFavorite(name,redraw){const before=recipeFavorites().slice(),next=new Set(before);if(next.has(name))next.delete(name);else next.add(name);state.settings.recipeFavorites=[...next];try{await persist();if(redraw)redraw()}catch(e){state.settings.recipeFavorites=before;console.error(e)}}
+function addFavoriteButton(row,name,redraw){const active=isFavoriteName(name);const b=btn(active?'♥':'♡',()=>toggleRecipeFavorite(name,redraw),'mini heart-btn'+(active?' is-fav':''));b.setAttribute('aria-label',active?'お気に入り解除':'お気に入り登録');row.append(b)}
+function renderRecipeBook(root,filter='all'){
   const own=state.recipes||{};
   const names=[...new Set([...Object.keys(standardRecipes),...Object.keys(own)])];
-  root.append(el('p','hint',`定番 ${Object.keys(standardRecipes).length}品 ／ 自分の保存レシピ ${Object.keys(own).length}品。保存したレシピはこの端末で使えます。`));
+  root.append(el('p','hint',`共通 ${Object.keys(standardRecipes).length}品 ／ 自分の保存レシピ ${Object.keys(own).length}品。保存したレシピはこの端末で使えます。`));
   if(standardRecipesError)root.append(el('p','hint',standardRecipesError));
   const search=el('input','search');search.type='search';search.placeholder='料理名で検索';root.append(search);
   const category=el('select','recipe-filter');
@@ -302,7 +307,7 @@ function renderRecipeBook(root){
   function draw(){
     list.replaceChildren();
     const query=search.value.trim().toLocaleLowerCase();
-    const filtered=names.filter(n=>n.toLocaleLowerCase().includes(query)&&(!category.value||(own[n]||standardRecipes[n])?.category===category.value)).sort((a,b)=>a.localeCompare(b,'ja'));
+    const filtered=names.filter(n=>(filter!=='favorites'||isFavoriteName(n))&&n.toLocaleLowerCase().includes(query)&&(!category.value||(own[n]||standardRecipes[n])?.category===category.value)).sort((a,b)=>a.localeCompare(b,'ja'));
     if(!filtered.length)list.append(el('p','empty-note',names.length?'該当するレシピがありません。':'まだレシピがありません。'));
     for(const name of filtered){
       const recipe=own[name]||standardRecipes[name];
@@ -310,7 +315,7 @@ function renderRecipeBook(root){
       const main=el('button','recipe-row-main');main.type='button';
       main.append(el('strong','',name),el('small','',`${recipe.category||'その他'} ／ 約${recipe.minutes||'?'}分 ／ ${own[name]?'自分の保存レシピ':'定番レシピ'}`));
       main.addEventListener('click',()=>openRecipe(name,()=>renderPanel()));
-      row.append(main,btn('見る',()=>openRecipe(name,()=>renderPanel())),btn('献立に追加',()=>addToCalendar(name)));
+      row.append(main);addFavoriteButton(row,name,draw);row.append(btn('見る',()=>openRecipe(name,()=>renderPanel())),btn('献立に追加',()=>addToCalendar(name)));
       if(own[name])row.append(btn('削除',async()=>{
         if(!confirm(`「${name}」の個人用レシピを削除しますか？${standardRecipes[name]?' 削除後は定番レシピに戻ります。':''}`))return;
         const old=own[name];delete own[name];
@@ -376,30 +381,11 @@ function renderIngredientFinder(root){
   }
   root.append(btn('作れる料理を探す',search,'action'));
 }
-function renderDishes(root){
-  if(dishesView==='home'){
-    const choices=[['recipes','🍳 簡単レシピ','定番50品と自分の保存レシピ'],['ingredients','🥕 材料から料理を探す','ある材料と足りない材料から候補を探す'],['favorites','★ よく作る料理','登録料理・お気に入りを管理']];
-    for(const [id,title,description] of choices){
-      const b=btn(title+'　›',()=>{dishesView=id;renderPanel()},'hub-choice');
-      const wrap=el('div','hub-card');wrap.append(b,el('p','hint',description));root.append(wrap);
-    }
-    return;
-  }
-  root.append(btn('← 料理一覧に戻る',()=>{dishesView='home';renderPanel()},'action secondary'));
-  if(dishesView==='recipes'){root.append(el('h3','section-title','簡単レシピ'));renderRecipeBook(root);return}
-  if(dishesView==='ingredients'){root.append(el('h3','section-title','材料から料理を探す'));renderIngredientFinder(root);return}
-  root.append(el('h3','section-title','よく作る料理'));
-  root.append(btn('＋ 料理を登録',()=>editDish(),'action'));
-  const search=el('input','search');search.placeholder='料理名・カテゴリで検索';root.append(search);
-  const favoriteOnly=el('label','settings-row');favoriteOnly.append(el('span','','お気に入りのみ表示'));const toggle=el('input');toggle.type='checkbox';favoriteOnly.append(toggle);root.append(favoriteOnly);
-  const list=el('div');root.append(list);
-  function draw(){list.replaceChildren();const query=search.value.trim().toLowerCase();const filtered=state.dishes.filter(d=>(!toggle.checked||d.favorite)&&(d.name.toLowerCase().includes(query)||d.category.toLowerCase().includes(query))).sort((a,b)=>Number(!!b.favorite)-Number(!!a.favorite));
-    if(!filtered.length)list.append(el('p','empty-note','該当する料理がありません。'));
-    filtered.forEach(d=>{const r=el('div','item'),main=el('div','item-main');const history=dishHistory(d.name);main.append(el('strong','',d.name),el('small','',d.category+(d.ingredients.length?' ／ '+d.ingredients.join('、'):'')),el('small','',history.length?'最終献立：'+history[0]+'（記録 '+history.length+'日）':'献立履歴なし'));
-      const fav=btn(d.favorite?'★':'☆',async()=>{d.favorite=!d.favorite;try{await persist();draw()}catch(e){console.error(e)}});fav.title='お気に入り';if(d.favorite)fav.classList.add('favorite');
-      r.append(main,fav,btn('🍳 簡単レシピ',()=>openRecipe(d.name,()=>renderPanel())),btn('献立に追加',()=>addToCalendar(d.name)),btn('編集',()=>editDish(d)),btn('削除',async()=>{if(!confirm(`「${d.name}」を料理一覧から削除しますか？\n過去の献立は残ります。`))return;state.dishes=state.dishes.filter(x=>x.id!==d.id);try{await persist();draw()}catch(e){console.error(e)}}));list.append(r)})}
-  search.addEventListener('input',draw);toggle.addEventListener('change',draw);draw();
-}
+function renderDishes(root){const tabs=el('div','recipe-tabs');for(const [id,label] of [['all','すべて'],['favorites','♡ お気に入り'],['mine','自分の料理']])tabs.append(btn(label,()=>{dishFilter=id;renderPanel()},dishFilter===id?'active':''));root.append(tabs);
+if(dishFilter==='all'){const finder=el('div','hub-card');finder.append(btn('🥕 材料から料理を探す　›',()=>{dishFilter='ingredients';renderPanel()},'hub-choice'),el('p','hint','家にある材料から料理を探し、不足材料を買い物リストへ'));root.append(finder);root.append(el('h3','section-title','すべての料理'));renderRecipeBook(root);return}
+if(dishFilter==='ingredients'){root.append(btn('← すべての料理へ',()=>{dishFilter='all';renderPanel()},'action secondary'));root.append(el('h3','section-title','材料から料理を探す'));renderIngredientFinder(root);return}
+if(dishFilter==='favorites'){root.append(el('h3','section-title','お気に入りの料理'));renderRecipeBook(root,'favorites');for(const d of state.dishes.filter(d=>d.favorite&&!standardRecipes[d.name]&&!state.recipes[d.name])){const r=el('div','recipe-row');r.append(el('strong','item-main',d.name),btn('♥',async()=>{d.favorite=false;await persist();renderPanel()},'mini heart-btn is-fav'),btn('献立に追加',()=>addToCalendar(d.name)));root.append(r)}return}
+root.append(el('h3','section-title','自分の料理'),btn('＋ 自分の料理を登録',()=>editDish(),'action'),el('p','hint','料理名だけでも登録OK。材料やメモは後から編集できます。'));const search=el('input','search');search.placeholder='料理名で検索';root.append(search);const list=el('div');root.append(list);function draw(){list.replaceChildren();const filtered=state.dishes.filter(d=>d.name.toLowerCase().includes(search.value.trim().toLowerCase())).sort((a,b)=>Number(!!b.favorite)-Number(!!a.favorite));if(!filtered.length)list.append(el('p','empty-note','登録した料理はまだありません。'));for(const d of filtered){const r=el('div','recipe-row'),main=el('div','item-main');main.append(el('strong','',d.name),el('small','',d.category+(d.ingredients?.length?' ／ '+d.ingredients.join('、'):'')));r.append(main,btn(d.favorite?'♥':'♡',async()=>{d.favorite=!d.favorite;await persist();draw()},'mini heart-btn'+(d.favorite?' is-fav':'')),btn('献立に追加',()=>addToCalendar(d.name)),btn('編集',()=>editDish(d)),btn('削除',async()=>{if(!confirm(`「${d.name}」を削除しますか？ 献立の履歴は残ります。`))return;const before=state.dishes;state.dishes=before.filter(x=>x.id!==d.id);try{await persist();draw()}catch(e){state.dishes=before;console.error(e)}}));list.append(r)}}search.addEventListener('input',draw);draw()}
 // 買い物の数量・単位・メモを独立管理（旧 quantity 文字列も表示可能）
 const shoppingUnits=['','個','本','袋','パック','枚','玉','束','缶','瓶','丁','片','合','カップ','g','kg','ml','L','その他'];
 function shoppingDisplay(x){
@@ -488,7 +474,7 @@ function validateBackup(payload){if(!isRecord(payload)||payload.app!=='kondate-b
 async function importBackup(file){if(!file)return;try{if(file.size>10*1024*1024)throw new Error('ファイルが大きすぎます（上限10MB）。');const text=await file.text();const data=validateBackup(JSON.parse(text));const mealCount=Object.values(data.menus).reduce((sum,day)=>sum+Object.values(day).reduce((n,arr)=>n+arr.length,0),0);const message=`バックアップを復元しますか？\n\n献立：${mealCount}品\n登録料理：${data.dishes.length}件\n買い物：${data.shopping.length}件\n\n現在の献立・料理・買い物・設定は、バックアップの内容で上書きされます。元に戻せません。`;if(!confirm(message))return;await saveQueue;await writeSnapshot(data);state=data;applyTheme();hideModal();changeTab('settings');alert('バックアップを復元しました。')}catch(e){console.error(e);alert('復元できませんでした。\n'+(e instanceof SyntaxError?'JSONファイルの形式が正しくありません。':e.message||'ファイルを確認してください。'))}}
 const tutorialSteps=[
   {picture:'🍚 🌿',title:'こんだて日和へようこそ！',description:'毎日のごはんを、もっと気軽に。献立も買い物も、ここでまとめて管理できます。'},
-  {picture:'📅 🍳',title:'献立を登録しよう',description:'献立表の日付をタップ！朝食・昼食・夕食に、食べたい料理を登録できます。'},
+  {picture:'📅 🍳',title:'献立を登録しよう',description:'カレンダーの日付をタップ！朝食・昼食・夕食に、食べたい料理を登録できます。'},
   {picture:'📖 🥕',title:'料理を登録しよう',description:'料理一覧によく作る料理や食材を登録すると、献立を考えるときに便利です。'},
   {picture:'🛒 🥬',title:'買い物もラクラク！',description:'料理や1週間の献立から、必要な食材を選んで買い物リストに追加できます。'}
 ];
@@ -511,12 +497,12 @@ function openTutorial(){
   }
   draw();
 }
-function renderSettings(root){
+function renderSettings(root){root.append(btn('← ホームに戻る',()=>changeTab('home'),'action secondary'));
   const guide=el('div','actions');guide.append(btn('📖 使い方ガイドを見る',openTutorial,'action secondary'));root.append(guide);
 root.append(el('p','hint','変更内容はこの端末に自動保存されます。'));root.append(el('h3','section-title','献立表に表示する食事'));meals.forEach((m,i)=>{const row=el('label','settings-row');row.append(el('span','',m));const check=el('input');check.type='checkbox';check.checked=state.settings.visible[i];check.addEventListener('change',async()=>{if(!check.checked&&state.settings.visible.filter(Boolean).length===1){check.checked=true;return alert('少なくとも1つの食事を表示してください')}state.settings.visible[i]=check.checked;try{await persist();renderCalendar()}catch(e){console.error(e)}});row.append(check);root.append(row)});root.append(el('h3','section-title','見た目'));settingSelect(root,'テーマ',[['auto','端末に合わせる'],['light','ライト'],['dark','ダーク']],state.settings.theme,async v=>{state.settings.theme=v;applyTheme();try{await persist()}catch(e){console.error(e)}});settingSelect(root,'アクセントカラー',[['green','グリーン'],['orange','オレンジ'],['pink','ピンク'],['blue','ブルー'],['purple','パープル'],['brown','ブラウン']],state.settings.color,async v=>{state.settings.color=v;applyTheme();try{await persist()}catch(e){console.error(e)}});
-const section=el('div','backup-area');section.append(el('h3','section-title','バックアップ・復元'));section.append(el('p','hint','献立・料理一覧・買い物リスト・設定を1つのJSONファイルに保存できます。iPhoneでは「ファイル」やiCloud Driveに保存してください。'));const controls=el('div','actions');controls.append(btn('バックアップを保存',exportBackup,'action'));const fileInput=el('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.className='hidden';fileInput.addEventListener('change',async()=>{const file=fileInput.files?.[0];fileInput.value='';await importBackup(file)});controls.append(btn('バックアップから復元',()=>fileInput.click(),'action secondary'));section.append(controls,fileInput);section.append(el('p','hint','復元すると現在のデータは上書きされます。先に現在のバックアップを保存することをおすすめします。'));root.append(section);renderRecurring(root);root.append(el('p','hint','v0.7：端末内に自動保存。バックアップは手動で作成してください。'))}
+const section=el('div','backup-area');section.append(el('h3','section-title','バックアップ・復元'));section.append(el('p','hint','献立・料理一覧・買い物リスト・設定を1つのJSONファイルに保存できます。iPhoneでは「ファイル」やiCloud Driveに保存してください。'));const controls=el('div','actions');controls.append(btn('バックアップを保存',exportBackup,'action'));const fileInput=el('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.className='hidden';fileInput.addEventListener('change',async()=>{const file=fileInput.files?.[0];fileInput.value='';await importBackup(file)});controls.append(btn('バックアップから復元',()=>fileInput.click(),'action secondary'));section.append(controls,fileInput);section.append(el('p','hint','復元すると現在のデータは上書きされます。先に現在のバックアップを保存することをおすすめします。'));root.append(section);renderRecurring(root);root.append(el('p','hint','v0.9：端末内に自動保存。バックアップは手動で作成してください。'))}
 $('prev').addEventListener('click',()=>{anchor=mode==='week'?plusDays(anchor,-7):new Date(anchor.getFullYear(),anchor.getMonth()-1,1);renderCalendar()});$('next').addEventListener('click',()=>{anchor=mode==='week'?plusDays(anchor,7):new Date(anchor.getFullYear(),anchor.getMonth()+1,1);renderCalendar()});$('weekly').addEventListener('click',()=>{mode='week';updateMode();renderCalendar()});$('monthly').addEventListener('click',()=>{mode='month';updateMode();renderCalendar()});document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>changeTab(b.dataset.tab)));$('settingsTop').addEventListener('click',()=>changeTab('settings'));$('closeModal').addEventListener('click',hideModal);$('modal').addEventListener('click',e=>{if(e.target===$('modal'))hideModal()});if(matchMedia('(prefers-color-scheme: dark)').addEventListener)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
-initDB().then(()=>{loadStandardRecipes();applyTheme();renderCalendar();try{if(localStorage.getItem('kondate-tutorial-completed')!=='1')openTutorial()}catch(e){openTutorial()}}).catch(e=>{console.error(e);alert('データ保存の初期化に失敗しました。Safariのプライベートブラウズ設定などを確認してください。');applyTheme();renderCalendar()});
+initDB().then(()=>{loadStandardRecipes();applyTheme();changeTab('home');try{if(localStorage.getItem('kondate-tutorial-completed')!=='1')openTutorial()}catch(e){openTutorial()}}).catch(e=>{console.error(e);alert('データ保存の初期化に失敗しました。Safariのプライベートブラウズ設定などを確認してください。');applyTheme();changeTab('home')});
 })();
 </script></body></html>
 ```
