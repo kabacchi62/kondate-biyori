@@ -50,7 +50,7 @@ async function loadStandardRecipes(){
     standardRecipes=Object.fromEntries(valid.map(r=>[r.name,r]));
     standardRecipesError='';
   }catch(e){console.error(e);standardRecipesError='定番レシピを読み込めませんでした。通信状況を確認して再読み込みしてください。'}
-  if(tab==='dishes')renderPanel();
+  if(tab==='dishes')renderPanel(); if(tab==='home')renderHome();
 }
 
 const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
