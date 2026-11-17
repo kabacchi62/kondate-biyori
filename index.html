@@ -187,7 +187,7 @@ function editMeal(date,meal){
       if(saveButton)saveButton.textContent='選んだ'+names.length+'品を保存する';
       selectedBox.replaceChildren();
       if(!names.length)selectedBox.append(el('p','empty-note','料理を選んでください'));
-      names.forEach((name,i)=>{   const row=el('div','item');   row.append(     el('span','item-main',name),     btn('削除',()=>{       names.splice(i,1);       drawSelected();       drawResults();     },'mini')   );   selectedBox.append(row); });
+      names.forEach((name,i)=>{   const row=el('div','item');    row.append(     el('span','item-main',name),     btn('削除',async()=>{       const before=state.menus[date]         ? structuredClone(state.menus[date])         : null;        const index=names.indexOf(name);       if(index<0)return;        names.splice(index,1);        state.menus[date]??={};       state.menus[date][meal]=[...names];        try{         await persist();         drawSelected();         drawResults();         renderCalendar();         if(tab==='home')renderHome();       }catch(e){         if(before===null)delete state.menus[date];         else state.menus[date]=before;          names.splice(index,0,name);         drawSelected();         drawResults();         console.error(e);       }     },'mini')   );    selectedBox.append(row); });
     }
     function drawResults(){
       results.replaceChildren();const q=search.value.trim().toLocaleLowerCase();
